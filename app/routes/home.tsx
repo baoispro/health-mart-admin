@@ -1,13 +1,13 @@
-import type { Route } from "./+types/home";
-import { Welcome } from "../welcome/welcome";
-
-export function meta({}: Route.MetaArgs) {
-  return [
-    { title: "New React Router App" },
-    { name: "description", content: "Welcome to React Router!" },
-  ];
-}
+import Sidebar from "~/components/SideBar";
+import HeaderDashboard from "../components/HeaderDashboard";
 
 export default function Home() {
-  return <Welcome />;
+  return ( 
+    <main className="flex">
+      <Sidebar />
+      <section className="flex-1 py-5 pl-20">
+        <HeaderDashboard></HeaderDashboard>
+      </section>
+    </main>
+  );
 }
