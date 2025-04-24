@@ -1,8 +1,16 @@
-import { type RouteConfig, index, route } from "@react-router/dev/routes";
+import {
+  type RouteConfig,
+  index,
+  layout,
+  route,
+} from "@react-router/dev/routes";
 
 export default [
-  index("routes/home.tsx"),
+  layout("components/layout/MainLayout.tsx", [
+    index("routes/home.tsx"),
+    route("users", "routes/users.tsx"),
+    // thêm route khác muốn dùng layout chung ở đây
+  ]),
   route("sign-in", "routes/sign-in.tsx"),
   route("sign-up", "routes/sign-up.tsx"),
-  route("users", "routes/users.tsx"),
-] satisfies RouteConfig;
+];
