@@ -1,5 +1,5 @@
 import { isRouteErrorResponse } from "react-router";
-import type { Route } from "../../+types/root";
+import type { Route } from "./+types/MainLayout";
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   let message = "Oops!";
