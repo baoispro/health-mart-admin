@@ -5,6 +5,7 @@ import {
   UserIcon,
   ChartBarIcon,
   CogIcon,
+  DocumentTextIcon,
 } from "@heroicons/react/24/outline";
 import type { JSX } from "react";
 import {Link, useLocation } from "react-router";
@@ -54,6 +55,12 @@ const Sidebar = () => {
             tooltip="Reports" 
             to="/"
             active={location.pathname === "/reports"}
+          />
+          <SidebarIcon 
+            icon={<DocumentTextIcon className="w-6 h-6 hover:text-[#000]" color="#64748b" />} 
+            tooltip="Policies" 
+            to="/policies"
+            active={location.pathname === "/policies"}
           />
         </div>
         <SidebarIcon 
