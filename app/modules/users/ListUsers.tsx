@@ -1,14 +1,11 @@
 import { useEffect, useState } from "react";
-import { Table, Button, Space, Typography, message } from "antd";
-import {
-  EditOutlined,
-  DeleteOutlined,
-  PlusCircleFilled,
-} from "@ant-design/icons";
+import { Table, Button, Space, Typography, message, Modal, Form, Input, Select, Upload } from "antd";
+import { EditOutlined, DeleteOutlined, PlusCircleFilled, UploadOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
-import { getAllUsers } from "~/api/user";
+import { getAllUsers, createUser, updateUser, deleteUser } from "~/api/user";
 
 const { Title, Text } = Typography;
+const { Option } = Select;
 
 interface User {
   id: number;
@@ -16,12 +13,17 @@ interface User {
   email: string;
   phone: string;
   role: string;
+  avatar?: string;
   createdAt?: string;
 }
 
 export default function ListUsers() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [form] = Form.useForm();
+  const [fileList, setFileList] = useState<any[]>([]);
 
   useEffect(() => {
     fetchUsers();
@@ -36,6 +38,89 @@ export default function ListUsers() {
       message.error("Lỗi khi tải danh sách người dùng");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleAddUser = () => {
+    setEditingUser(null);
+    form.resetFields();
+    setFileList([]);
+    setIsModalOpen(true);
+  };
+
+  const handleEditUser = (user: User) => {
+    setEditingUser(user);
+    form.setFieldsValue(user);
+    setFileList(
+      user.avatar
+        ? [
+          {
+            uid: "-1",
+            name: "avatar.png",
+            status: "done",
+            url: user.avatar,
+          },
+        ]
+        : []
+    );
+    setIsModalOpen(true);
+  };
+
+  const handleDeleteUser = async (id: number) => {
+    try {
+      await deleteUser(id);
+      message.success("Xóa người dùng thành công");
+      fetchUsers();
+    } catch (error) {
+      message.error("Lỗi khi xóa người dùng");
+    }
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const values = await form.validateFields();
+
+      const formData = new FormData();
+      formData.append("fullName", values.fullName);
+      formData.append("email", values.email);
+      formData.append("phone", values.phone);
+      formData.append("role", values.role);
+
+      // Nếu có file ảnh, thêm file vào FormData
+      if (fileList.length > 0) {
+        const file = fileList[0].originFileObj; // Lấy file thực tế
+        formData.append("avatar", file); // Key phải là "avatar"
+      } else if (editingUser?.avatar) {
+        // Nếu không có file mới, gửi URL avatar cũ
+        formData.append("avatar", editingUser.avatar);
+      }
+
+      if (!editingUser) {
+        formData.append("password", values.password);
+        await createUser(formData);
+        message.success("Tạo người dùng thành công");
+      } else {
+        await updateUser(editingUser.id, formData);
+        message.success("Cập nhật người dùng thành công");
+      }
+
+      setIsModalOpen(false);
+      fetchUsers();
+    } catch (error: any) {
+      if (error.response?.status === 409) {
+        const errorMessage = error.response.data.message;
+
+        if (errorMessage.includes("Email") || errorMessage.includes("số điện thoại")) {
+          form.setFields([
+            {
+              name: "phone",
+              errors: ["Email hoặc số điện thoại đã tồn tại!"],
+            },
+          ]);
+        }
+      } else {
+        message.error("Đã xảy ra lỗi, vui lòng thử lại");
+      }
     }
   };
 
@@ -92,7 +177,7 @@ export default function ListUsers() {
           <Button
             type="link"
             icon={<EditOutlined />}
-            onClick={() => message.info(`Edit user ${record.id}`)}
+            onClick={() => handleEditUser(record)}
           >
             Edit
           </Button>
@@ -100,7 +185,7 @@ export default function ListUsers() {
             type="link"
             danger
             icon={<DeleteOutlined />}
-            onClick={() => message.info(`Delete user ${record.id}`)}
+            onClick={() => handleDeleteUser(record.id)}
           >
             Delete
           </Button>
@@ -114,7 +199,7 @@ export default function ListUsers() {
       <div className="mb-6">
         <Title level={3}>Users</Title>
         <Text type="secondary">List User</Text>
-        <Button type="primary" className="float-right">
+        <Button type="primary" className="float-right" onClick={handleAddUser}>
           <PlusCircleFilled style={{ marginRight: 8 }} />
           Add User
         </Button>
@@ -128,6 +213,82 @@ export default function ListUsers() {
         pagination={{ pageSize: 5 }}
         bordered
       />
+
+      <Modal
+        title={editingUser ? "Edit User" : "Add User"}
+        open={isModalOpen}
+        onCancel={() => setIsModalOpen(false)}
+        onOk={handleSubmit}
+      >
+        <Form form={form} layout="vertical">
+          <Form.Item label="Avatar">
+            <Upload
+              listType="picture"
+              fileList={fileList}
+              beforeUpload={() => false} // Ngăn không cho upload tự động
+              onChange={({ fileList }) => setFileList(fileList)}
+            >
+              <Button icon={<UploadOutlined />}>Chọn ảnh</Button>
+            </Upload>
+          </Form.Item>
+
+          <Form.Item
+            name="fullName"
+            label="Full Name"
+            rules={[{ required: true, message: "Tên không được để trống" }]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            name="email"
+            label="Email"
+            rules={[
+              { required: true, message: "Email không được để trống" },
+              { type: "email", message: "Email không hợp lệ" },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            name="phone"
+            label="Phone"
+            rules={[
+              { required: true, message: "Số điện thoại không được để trống" },
+              {
+                pattern: /^(0[1-9][0-9]{8,9})$/,
+                message:
+                  "Số điện thoại không hợp lệ, phải có 10 hoặc 11 chữ số và bắt đầu bằng số 0",
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+
+          <Form.Item
+            name="role"
+            label="Role"
+            rules={[{ required: true, message: "Vui lòng chọn vai trò" }]}
+          >
+            <Select>
+              <Option value="customer">Customer</Option>
+              <Option value="admin">Admin</Option>
+              <Option value="seller">Seller</Option>
+            </Select>
+          </Form.Item>
+
+          {!editingUser && (
+            <Form.Item
+              name="password"
+              label="Password"
+              rules={[{ required: true, message: "Mật khẩu không được để trống" }]}
+            >
+              <Input.Password />
+            </Form.Item>
+          )}
+        </Form>
+      </Modal>
     </div>
   );
 }

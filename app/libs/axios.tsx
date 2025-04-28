@@ -12,6 +12,13 @@ axiosInstance.interceptors.request.use(
     if (user?.accessToken) {
       config.headers.Authorization = `Bearer ${user.accessToken}`;
     }
+
+    if (!(config.data instanceof FormData)) {
+      config.headers["Content-Type"] = "application/json";
+    } else {
+      delete config.headers["Content-Type"];
+    }
+
     return config;
   },
   (error) => Promise.reject(error)

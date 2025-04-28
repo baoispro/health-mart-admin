@@ -6,6 +6,8 @@ import {
   ChartBarIcon,
   CogIcon,
   TagIcon,
+  DocumentTextIcon,
+  StarIcon,
 } from "@heroicons/react/24/outline";
 import type { JSX } from "react";
 import { Link, useLocation } from "react-router";
@@ -49,16 +51,8 @@ const Sidebar = () => {
               <CubeIcon className="w-6 h-6 hover:text-[#000]" color="#64748b" />
             }
             tooltip="Products"
-            to="/products"
+            to="/"
             active={location.pathname === "/products"}
-          />
-          <SidebarIcon
-            icon={
-              <TagIcon className="w-6 h-6 hover:text-[#000]" color="#64748b" />
-            }
-            tooltip="Categories"
-            to="/categories"
-            active={location.pathname === "/categories"}
           />
           <SidebarIcon
             icon={
@@ -81,6 +75,25 @@ const Sidebar = () => {
             tooltip="Reports"
             to="/"
             active={location.pathname === "/reports"}
+          />
+          <SidebarIcon
+            icon={
+              <DocumentTextIcon
+                className="w-6 h-6 hover:text-[#000]"
+                color="#64748b"
+              />
+            }
+            tooltip="Policies"
+            to="/policies"
+            active={location.pathname === "/policies"}
+          />
+          <SidebarIcon
+            icon={
+              <StarIcon className="w-6 h-6 hover:text-[#000]" color="#64748b" />
+            }
+            tooltip="Review"
+            to="/reviews"
+            active={location.pathname === "/reviews"}
           />
         </div>
         <SidebarIcon
@@ -111,7 +124,7 @@ const SidebarIcon: React.FC<SidebarIconProps> = ({
     >
       {icon}
     </div>
-    <span className="absolute left-15 z-50 px-2 py-1 bg-gray-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100">
+    <span className="absolute left-15 px-2 py-1 bg-gray-800 text-white text-xs rounded-md opacity-0 group-hover:opacity-100">
       {tooltip}
     </span>
   </Link>
