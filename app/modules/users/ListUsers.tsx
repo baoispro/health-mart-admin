@@ -1,10 +1,6 @@
 import { useEffect, useState } from "react";
-import { Table, Button, Space, Typography, message, Modal, Form, Input, Select } from "antd";
-import {
-  EditOutlined,
-  DeleteOutlined,
-  PlusCircleFilled,
-} from "@ant-design/icons";
+import { Table, Button, Space, Typography, message, Modal, Form, Input, Select, Upload } from "antd";
+import { EditOutlined, DeleteOutlined, PlusCircleFilled, UploadOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import { getAllUsers, createUser, updateUser, deleteUser } from "~/api/user";
 
@@ -17,6 +13,7 @@ interface User {
   email: string;
   phone: string;
   role: string;
+  avatar?: string;
   createdAt?: string;
 }
 
@@ -26,7 +23,7 @@ export default function ListUsers() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [form] = Form.useForm();
-
+  const [fileList, setFileList] = useState<any[]>([]);
 
   useEffect(() => {
     fetchUsers();
@@ -47,12 +44,25 @@ export default function ListUsers() {
   const handleAddUser = () => {
     setEditingUser(null);
     form.resetFields();
+    setFileList([]);
     setIsModalOpen(true);
   };
 
   const handleEditUser = (user: User) => {
     setEditingUser(user);
     form.setFieldsValue(user);
+    setFileList(
+      user.avatar
+        ? [
+          {
+            uid: "-1",
+            name: "avatar.png",
+            status: "done",
+            url: user.avatar,
+          },
+        ]
+        : []
+    );
     setIsModalOpen(true);
   };
 
@@ -70,12 +80,28 @@ export default function ListUsers() {
     try {
       const values = await form.validateFields();
 
-      if (editingUser) {
-        await updateUser(editingUser.id, values);
-        message.success("Cập nhật người dùng thành công");
-      } else {
-        await createUser(values);
+      const formData = new FormData();
+      formData.append("fullName", values.fullName);
+      formData.append("email", values.email);
+      formData.append("phone", values.phone);
+      formData.append("role", values.role);
+
+      // Nếu có file ảnh, thêm file vào FormData
+      if (fileList.length > 0) {
+        const file = fileList[0].originFileObj; // Lấy file thực tế
+        formData.append("avatar", file); // Key phải là "avatar"
+      } else if (editingUser?.avatar) {
+        // Nếu không có file mới, gửi URL avatar cũ
+        formData.append("avatar", editingUser.avatar);
+      }
+
+      if (!editingUser) {
+        formData.append("password", values.password);
+        await createUser(formData);
         message.success("Tạo người dùng thành công");
+      } else {
+        await updateUser(editingUser.id, formData);
+        message.success("Cập nhật người dùng thành công");
       }
 
       setIsModalOpen(false);
@@ -195,23 +221,21 @@ export default function ListUsers() {
         onOk={handleSubmit}
       >
         <Form form={form} layout="vertical">
-          <Form.Item
-            name="avatar"
-            label="Avatar URL"
-            rules={[
-              { required: false },
-              { type: "url", message: "Vui lòng nhập một URL hợp lệ" },
-            ]}
-          >
-            <Input />
+          <Form.Item label="Avatar">
+            <Upload
+              listType="picture"
+              fileList={fileList}
+              beforeUpload={() => false} // Ngăn không cho upload tự động
+              onChange={({ fileList }) => setFileList(fileList)}
+            >
+              <Button icon={<UploadOutlined />}>Chọn ảnh</Button>
+            </Upload>
           </Form.Item>
 
           <Form.Item
             name="fullName"
             label="Full Name"
-            rules={[
-              { required: true, message: "Tên không được để trống" },
-            ]}
+            rules={[{ required: true, message: "Tên không được để trống" }]}
           >
             <Input />
           </Form.Item>
@@ -245,9 +269,7 @@ export default function ListUsers() {
           <Form.Item
             name="role"
             label="Role"
-            rules={[
-              { required: true, message: "Vui lòng chọn vai trò" },
-            ]}
+            rules={[{ required: true, message: "Vui lòng chọn vai trò" }]}
           >
             <Select>
               <Option value="customer">Customer</Option>
@@ -260,9 +282,7 @@ export default function ListUsers() {
             <Form.Item
               name="password"
               label="Password"
-              rules={[
-                { required: true, message: "Mật khẩu không được để trống" },
-              ]}
+              rules={[{ required: true, message: "Mật khẩu không được để trống" }]}
             >
               <Input.Password />
             </Form.Item>
