@@ -6,6 +6,7 @@ import {
   ChartBarIcon,
   CogIcon,
   DocumentTextIcon,
+  StarIcon,
 } from "@heroicons/react/24/outline";
 import type { JSX } from "react";
 import {Link, useLocation } from "react-router";
@@ -32,42 +33,48 @@ const Sidebar = () => {
             to="/"
             active={location.pathname === "/"}
           />
-          <SidebarIcon 
-            icon={<UserIcon className="w-6 h-6 hover:text-[#000]" color="#64748b" />} 
-            tooltip="Users" 
+          <SidebarIcon
+            icon={<UserIcon className="w-6 h-6 hover:text-[#000]" color="#64748b" />}
+            tooltip="Users"
             to="/users"
             active={location.pathname === "/users"}
           />
-          <SidebarIcon 
-            icon={<CubeIcon className="w-6 h-6 hover:text-[#000]" color="#64748b" />} 
-            tooltip="Products" 
+          <SidebarIcon
+            icon={<CubeIcon className="w-6 h-6 hover:text-[#000]" color="#64748b" />}
+            tooltip="Products"
             to="/"
             active={location.pathname === "/products"}
           />
           <SidebarIcon
-            icon={<ShoppingCartIcon className="w-6 h-6 hover:text-[#000]" color="#64748b" />} 
-            tooltip="Orders" 
+            icon={<ShoppingCartIcon className="w-6 h-6 hover:text-[#000]" color="#64748b" />}
+            tooltip="Orders"
             to="/"
             active={location.pathname === "/orders"}
           />
-          <SidebarIcon 
-            icon={<ChartBarIcon className="w-6 h-6 hover:text-[#000]" color="#64748b" />} 
-            tooltip="Reports" 
+          <SidebarIcon
+            icon={<ChartBarIcon className="w-6 h-6 hover:text-[#000]" color="#64748b" />}
+            tooltip="Reports"
             to="/"
             active={location.pathname === "/reports"}
           />
-          <SidebarIcon 
-            icon={<DocumentTextIcon className="w-6 h-6 hover:text-[#000]" color="#64748b" />} 
-            tooltip="Policies" 
+          <SidebarIcon
+            icon={<DocumentTextIcon className="w-6 h-6 hover:text-[#000]" color="#64748b" />}
+            tooltip="Policies"
             to="/policies"
             active={location.pathname === "/policies"}
           />
+          <SidebarIcon
+            icon={<StarIcon className="w-6 h-6 hover:text-[#000]" color="#64748b" />}
+            tooltip="Review"
+            to="/reviews"
+            active={location.pathname === "/reviews"}
+          />
         </div>
-        <SidebarIcon 
-          icon={<CogIcon className="w-6 h-6 hover:text-[#000]" color="#64748b" />} 
-          tooltip="Settings" 
+        <SidebarIcon
+          icon={<CogIcon className="w-6 h-6 hover:text-[#000]" color="#64748b" />}
+          tooltip="Settings"
           to="/"
-            active={location.pathname === "/setting"}
+          active={location.pathname === "/setting"}
         />
       </main>
     </aside>
@@ -76,7 +83,7 @@ const Sidebar = () => {
 
 // Sidebar Icon Component
 const SidebarIcon: React.FC<SidebarIconProps> = ({ icon, tooltip, to, active }) => (
-  <Link 
+  <Link
     to={to}
     className={`relative group flex items-center justify-center`}
   >
