@@ -1,41 +1,49 @@
-// src/lib/axios.js
 import axios from "axios";
+import { getRefreshToken, logout, setAccessToken } from "~/utils/auth";
 
-// ✅ Tạo Axios instance
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
-  timeout: 15000,
-  headers: {
-    "Content-Type": "application/json",
-  },
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:3001/api",
 });
 
-// ✅ Request interceptor (thêm token vào headers nếu có)
+// Request: tự gắn accessToken vào
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("accessToken");
-    if (token) {
-      config.headers["Authorization"] = `Bearer ${token}`;
+    const user = JSON.parse(localStorage.getItem("auth_user") || "{}");
+    if (user?.accessToken) {
+      config.headers.Authorization = `Bearer ${user.accessToken}`;
     }
     return config;
   },
   (error) => Promise.reject(error)
 );
 
-// ✅ Response interceptor (xử lý lỗi chung)
+// Response: nếu 401 thì tự gọi refresh
 axiosInstance.interceptors.response.use(
   (response) => response,
-  (error) => {
-    const { status } = error.response || {};
+  async (error) => {
+    const originalRequest = error.config;
 
-    if (status === 401) {
-      console.warn("⚠️ Token hết hạn hoặc không hợp lệ");
-      // Ví dụ: logout, redirect, v.v.
-      // window.location.href = '/login';
-    }
+    // Nếu lỗi 401 và chưa thử lại
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      try {
+        const refreshToken = getRefreshToken();
+        if (refreshToken) {
+          const { data } = await axios.post("/auth/refresh-token", {
+            refreshToken,
+          });
 
-    if (status === 500) {
-      console.error("💥 Server error!");
+          setAccessToken(data.accessToken);
+          originalRequest.headers.Authorization = `Bearer ${data.accessToken}`;
+          return axiosInstance(originalRequest);
+        } else {
+          logout();
+          window.location.href = "/sign-in";
+        }
+      } catch (refreshError) {
+        logout();
+        window.location.href = "/sign-in";
+      }
     }
 
     return Promise.reject(error);
