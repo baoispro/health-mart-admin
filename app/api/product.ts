@@ -65,7 +65,8 @@ export const createSideEffects = async (sideEffects: any) => {
 };
 
 export const updateProductById = async (id: number, payload: any) => {
-  const res = await axiosInstance.post(`/product/${id}`, payload);
+  const data = { ...payload, price: parseInt(payload.price as string) };
+  const res = await axiosInstance.put(`/product/${id}`, data);
   return res.data;
 };
 

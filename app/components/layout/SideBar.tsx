@@ -51,8 +51,16 @@ const Sidebar = () => {
               <CubeIcon className="w-6 h-6 hover:text-[#000]" color="#64748b" />
             }
             tooltip="Products"
-            to="/"
+            to="/products"
             active={location.pathname === "/products"}
+          />
+          <SidebarIcon
+            icon={
+              <TagIcon className="w-6 h-6 hover:text-[#000]" color="#64748b" />
+            }
+            tooltip="Categories"
+            to="/categories"
+            active={location.pathname === "/categories"}
           />
           <SidebarIcon
             icon={
@@ -62,7 +70,7 @@ const Sidebar = () => {
               />
             }
             tooltip="Orders"
-            to="/"
+            to="/orders"
             active={location.pathname === "/orders"}
           />
           <SidebarIcon
