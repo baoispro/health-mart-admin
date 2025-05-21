@@ -134,10 +134,10 @@ export default function GeneralInfoTab({ form }: { form: FormInstance }) {
 
           {/* image_url */}
           <Form.Item
-            name="avatarFile"
+            name="image_url"
             label="Ảnh sản phẩm"
             valuePropName="fileList"
-            getValueFromEvent={(e) => (Array.isArray(e) ? e : e?.fileList)}
+            getValueFromEvent={(e) => Array.isArray(e) ? e : e?.fileList}
             rules={[{ required: true, message: "Vui lòng chọn ảnh sản phẩm" }]}
           >
             <Upload
