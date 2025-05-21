@@ -1,12 +1,27 @@
 import { useEffect, useState } from "react";
-import { Table, Button, Space, Typography, message, Modal, Form, Input } from "antd";
+import {
+  Table,
+  Button,
+  Space,
+  Typography,
+  message,
+  Modal,
+  Form,
+  Input,
+} from "antd";
 import {
   EditOutlined,
   DeleteOutlined,
   PlusCircleFilled,
 } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
-import { getAllPolicies, createPolicy, updatePolicy, deletePolicy } from "~/api/policy";
+import {
+  getAllPolicies,
+  createPolicy,
+  updatePolicy,
+  deletePolicy,
+} from "~/api/policy";
+import { toast } from "react-toastify";
 
 const { Title, Text } = Typography;
 
@@ -34,7 +49,7 @@ export default function ListPolicies() {
       const data = await getAllPolicies();
       setPolicies(data);
     } catch (error) {
-      message.error("Lỗi khi tải danh sách chính sách");
+      toast.error("Lỗi khi tải danh sách chính sách");
     } finally {
       setLoading(false);
     }
@@ -55,10 +70,10 @@ export default function ListPolicies() {
   const handleDeletePolicy = async (id: number) => {
     try {
       await deletePolicy(id.toString());
-      message.success("Xóa chính sách thành công");
+      toast.success("Xóa chính sách thành công");
       fetchPolicies();
     } catch (error) {
-      message.error("Lỗi khi xóa chính sách");
+      toast.error("Lỗi khi xóa chính sách");
     }
   };
 
@@ -68,10 +83,10 @@ export default function ListPolicies() {
 
       if (editingPolicy) {
         await updatePolicy(editingPolicy.id.toString(), values);
-        message.success("Cập nhật chính sách thành công");
+        toast.success("Cập nhật chính sách thành công");
       } else {
         await createPolicy(values);
-        message.success("Tạo chính sách thành công");
+        toast.success("Tạo chính sách thành công");
       }
 
       setIsModalOpen(false);
@@ -89,7 +104,7 @@ export default function ListPolicies() {
           ]);
         }
       } else {
-        message.error("Đã xảy ra lỗi, vui lòng thử lại");
+        toast.error("Đã xảy ra lỗi, vui lòng thử lại");
       }
     }
   };
@@ -146,7 +161,11 @@ export default function ListPolicies() {
       <div className="mb-6">
         <Title level={3}>Policies</Title>
         <Text type="secondary">List of Policies</Text>
-        <Button type="primary" className="float-right" onClick={handleAddPolicy}>
+        <Button
+          type="primary"
+          className="float-right"
+          onClick={handleAddPolicy}
+        >
           <PlusCircleFilled style={{ marginRight: 8 }} />
           Add Policy
         </Button>
@@ -157,7 +176,7 @@ export default function ListPolicies() {
         loading={loading}
         columns={columns}
         dataSource={policies}
-        pagination={{ pageSize: 5 }}
+        pagination={{ pageSize: 10 }}
         bordered
       />
 
@@ -171,9 +190,7 @@ export default function ListPolicies() {
           <Form.Item
             name="slug"
             label="Slug"
-            rules={[
-              { required: true, message: "Slug không được để trống" },
-            ]}
+            rules={[{ required: true, message: "Slug không được để trống" }]}
           >
             <Input />
           </Form.Item>
@@ -181,9 +198,7 @@ export default function ListPolicies() {
           <Form.Item
             name="title"
             label="Title"
-            rules={[
-              { required: true, message: "Title không được để trống" },
-            ]}
+            rules={[{ required: true, message: "Title không được để trống" }]}
           >
             <Input />
           </Form.Item>
@@ -191,9 +206,7 @@ export default function ListPolicies() {
           <Form.Item
             name="content"
             label="Content"
-            rules={[
-              { required: true, message: "Content không được để trống" },
-            ]}
+            rules={[{ required: true, message: "Content không được để trống" }]}
           >
             <Input.TextArea rows={4} />
           </Form.Item>

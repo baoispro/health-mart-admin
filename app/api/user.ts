@@ -15,7 +15,7 @@ export const createUser = async (userData: Record<string, any>) => {
   return response.data;
 };
 
-export const updateUser = async (id: number, userData: Record<string, any>) => {
+export const updateUser = async (id: string, userData: Record<string, any>) => {
   const response = await axiosInstance.put(`/user/${id}`, userData);
   return response.data;
 };

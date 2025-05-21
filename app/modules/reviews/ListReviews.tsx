@@ -25,6 +25,7 @@ import {
 import { Tooltip } from "antd";
 import { Table, type TableColumnsType } from "antd";
 import { useAuth } from "~/hooks/useAuth";
+import { toast } from "react-toastify";
 
 const { Title } = Typography;
 
@@ -66,7 +67,7 @@ export default function ListReviews() {
       const response = await getAllReviews();
       setReviews(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
-      message.error("Lỗi khi tải danh sách đánh giá");
+      toast.error("Lỗi khi tải danh sách đánh giá");
     } finally {
       setLoading(false);
     }
@@ -80,13 +81,13 @@ export default function ListReviews() {
           staffId: Number(user?.userId),
           replyText: values.replyText,
         });
-        message.success("Phản hồi đã được thêm");
+        toast.success("Phản hồi đã được thêm");
         fetchReviews();
       }
       setIsReplyModalOpen(false);
       replyForm.resetFields();
     } catch (error) {
-      message.error("Lỗi khi thêm phản hồi");
+      toast.error("Lỗi khi thêm phản hồi");
     }
   };
 
@@ -119,15 +120,15 @@ export default function ListReviews() {
       if (currentReplyId) {
         await updateReply(currentReplyId, {
           ...values,
-          staffId: Number(user?.userId), 
+          staffId: Number(user?.userId),
         });
-        message.success("Cập nhật phản hồi thành công");
+        toast.success("Cập nhật phản hồi thành công");
         fetchReviews();
       }
       setIsReplyModalOpen(false);
       replyForm.resetFields();
     } catch (error) {
-      message.error("Lỗi khi cập nhật phản hồi");
+      toast.error("Lỗi khi cập nhật phản hồi");
     }
   };
 
@@ -139,11 +140,11 @@ export default function ListReviews() {
           review.id === id ? { ...review, isHidden: !isHidden } : review
         )
       );
-      message.success(
+      toast.success(
         isHidden ? "Đánh giá đã được hiển thị" : "Đánh giá đã bị ẩn"
       );
     } catch (error) {
-      message.error("Lỗi khi thay đổi trạng thái hiển thị");
+      toast.error("Lỗi khi thay đổi trạng thái hiển thị");
     }
   };
 
@@ -330,7 +331,7 @@ export default function ListReviews() {
         loading={loading}
         columns={columns}
         dataSource={reviews}
-        pagination={{ pageSize: 5 }}
+        pagination={{ pageSize: 10 }}
         bordered
       />
 

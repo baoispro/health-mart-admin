@@ -8,6 +8,7 @@ import {
   PlusCircleFilled,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router";
+import { toast } from "react-toastify";
 const { Title, Text } = Typography;
 export default function ProductList() {
   const [products, setProducts] = useState([]);
@@ -18,9 +19,9 @@ export default function ProductList() {
     try {
       const data = await getAllProducts();
       setProducts(data);
-      message.success("Lấy danh sách sản phẩm thành công");
+      toast.success("Lấy danh sách sản phẩm thành công");
     } catch (err) {
-      message.error("Lỗi khi lấy danh sách sản phẩm");
+      toast.error("Lỗi khi lấy danh sách sản phẩm");
     } finally {
       setLoading(false);
     }

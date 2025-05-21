@@ -26,6 +26,7 @@ import {
   // updateProduct,
 } from "~/api/product";
 import PrecautionsTab from "./PrecautionsTab";
+import { toast } from "react-toastify";
 
 interface Props {
   productId?: number; // 👈 thêm props
@@ -95,149 +96,11 @@ export default function UpsertFormProduct({
         });
       }
     } catch (error) {
-      message.error("Không thể lấy thông tin sản phẩm!");
+      toast.error("Không thể lấy thông tin sản phẩm!");
     } finally {
       setLoading(false);
     }
   };
-
-  // const handleFinish = async (values: any) => {
-  //   try {
-  //     if (mode === "edit" && productId) {
-  //       const payload = {
-  //         name: values.name,
-  //         price: values.price,
-  //         brand: values.brand,
-  //         unit: values.unit,
-  //         category_id: values.category_id,
-  //         specification: values.specification,
-  //         country: values.country,
-  //         short_description: values.short_description,
-  //         manufacturer: values.manufacturer,
-  //         registration_number: values.registration_number,
-  //         description_html: values.description_html,
-  //         slug: values.slug,
-  //         image_url: values.image_url,
-  //       };
-  //       const res = await updateProductById(productId, payload);
-  //       if (res.statusCode === 200 || res.statusCode === 201) {
-  //         const payloadIngredients = {
-  //           name: values.name_ingradient,
-  //           concentration: values.concentration,
-  //         };
-
-  //         const payloadStorages = {
-  //           description: values.description_storage,
-  //         };
-
-  //         const payloadUsages = {
-  //           description: values.description_usages,
-  //         };
-
-  //         const payloadDosages = {
-  //           description: values.description_dosage,
-  //         };
-
-  //         const payloadSideEffects = {
-  //           description: values.description_side_effects,
-  //         };
-
-  //         try {
-  //           await Promise.all([
-  //             updateProductIngredientsById(
-  //               res.data.product_id,
-  //               payloadIngredients
-  //             ),
-  //             updateProductUsagesById(res.data.product_id, payloadUsages),
-  //             updateProductDosagesById(res.data.product_id, payloadDosages),
-  //             updateProductSideEffectsById(
-  //               res.data.product_id,
-  //               payloadSideEffects
-  //             ),
-  //             updateProductDosagesById(res.data.product_id, payloadStorages),
-  //           ]);
-
-  //           message.success(
-  //             "Tạo sản phẩm và tất cả dữ liệu liên quan thành công!"
-  //           );
-  //         } catch (err) {
-  //           console.error("❌ Lỗi khi tạo các thông tin liên quan:", err);
-  //           message.error(
-  //             "Tạo sản phẩm thành công nhưng lỗi khi lưu dữ liệu liên quan!"
-  //           );
-  //         }
-  //       }
-  //       message.success("Cập nhật sản phẩm thành công!");
-  //     } else {
-  //       const payload = {
-  //         name: values.name,
-  //         price: values.price,
-  //         brand: values.brand,
-  //         unit: values.unit,
-  //         category_id: values.category_id,
-  //         specification: values.specification,
-  //         country: values.country,
-  //         short_description: values.short_description,
-  //         manufacturer: values.manufacturer,
-  //         registration_number: values.registration_number,
-  //         description_html: values.description_html,
-  //         slug: values.slug,
-  //         image_url: values.image_url,
-  //       };
-  //       const res = await createProduct(payload);
-
-  //       if (res.statusCode === 200 || res.statusCode === 201) {
-  //         const payloadIngredients = {
-  //           product_id: res.data.product_id,
-  //           name: values.name_ingradient,
-  //           concentration: values.concentration,
-  //         };
-
-  //         const payloadStorages = {
-  //           product_id: res.data.product_id,
-  //           description: values.description_storage,
-  //         };
-
-  //         const payloadUsages = {
-  //           product_id: res.data.product_id,
-  //           description: values.description_usages,
-  //         };
-
-  //         const payloadDosages = {
-  //           product_id: res.data.product_id,
-  //           description: values.description_dosage,
-  //         };
-
-  //         const payloadSideEffects = {
-  //           product_id: res.data.product_id,
-  //           description: values.description_side_effects,
-  //         };
-
-  //         try {
-  //           await Promise.all([
-  //             createIngredients(payloadIngredients),
-  //             createUsages(payloadUsages),
-  //             createDosages(payloadDosages),
-  //             createSideEffects(payloadSideEffects),
-  //             createStorages(payloadStorages),
-  //           ]);
-
-  //           message.success(
-  //             "Tạo sản phẩm và tất cả dữ liệu liên quan thành công!"
-  //           );
-  //         } catch (err) {
-  //           console.error("❌ Lỗi khi tạo các thông tin liên quan:", err);
-  //           message.error(
-  //             "Tạo sản phẩm thành công nhưng lỗi khi lưu dữ liệu liên quan!"
-  //           );
-  //         }
-  //       }
-  //     }
-  //   } catch (error: any) {
-  //     console.error(error);
-  //     message.error("Có lỗi xảy ra khi lưu sản phẩm!");
-  //   }
-  // };
 
   const handleFinish = async (values: any) => {
     try {
@@ -324,7 +187,7 @@ export default function UpsertFormProduct({
             : createStorages(payloadStorages),
         ]);
 
-        message.success(
+        toast.success(
           mode === "edit"
             ? "Cập nhật sản phẩm thành công!"
             : "Tạo sản phẩm và tất cả dữ liệu liên quan thành công!"
@@ -345,13 +208,13 @@ export default function UpsertFormProduct({
 
         form.setFields(fieldErrors);
 
-        message.error(
+        toast.error(
           `Vui lòng kiểm tra lại ${fieldErrors.length} trường thông tin!`
         );
       } else if (typeof apiMessage === "string") {
-        message.error(apiMessage);
+        toast.error(apiMessage);
       } else {
-        message.error("Có lỗi xảy ra khi lưu sản phẩm!");
+        toast.error("Có lỗi xảy ra khi lưu sản phẩm!");
       }
     }
   };
@@ -373,9 +236,7 @@ export default function UpsertFormProduct({
         }}
         onFinishFailed={({ errorFields }) => {
           if (errorFields.length > 0) {
-            message.error(
-              "Bạn cần nhập đầy đủ và đúng thông tin trước khi lưu!"
-            );
+            toast.error("Bạn cần nhập đầy đủ và đúng thông tin trước khi lưu!");
           }
         }}
       >

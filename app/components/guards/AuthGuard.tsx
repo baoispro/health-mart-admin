@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useAuth } from "~/hooks/useAuth";
 import { useNavigate, useLocation } from "react-router";
+import { ToastContainer } from "react-toastify";
 
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
@@ -9,9 +10,9 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!isAuthenticated) {
-      // Nếu chưa login và không ở sign-in
-      if (location.pathname !== "/sign-in") {
-        navigate("/sign-in");
+      // Nếu chưa login và không ở login
+      if (location.pathname !== "/login") {
+        navigate("/login");
       }
     }
   }, [isAuthenticated, location.pathname, navigate]);

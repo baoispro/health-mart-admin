@@ -11,6 +11,7 @@ import type { Route } from "./+types/root";
 import "./app.css";
 import { ConfigProvider } from "antd";
 import { AuthProvider } from "./contexts/AuthContext";
+import { ToastContainer } from "react-toastify";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -32,11 +33,17 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
-        <Links />
+        <title>Admin - Nhà thuốc HealthMart</title>
       </head>
       <body>
         <AuthProvider>
           {children}
+          <ToastContainer
+            position="top-right"
+            autoClose={2000}
+            theme="colored"
+            style={{ zIndex: 9999 }}
+          />
           <ScrollRestoration />
           <Scripts />
         </AuthProvider>
