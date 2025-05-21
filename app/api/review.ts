@@ -23,7 +23,7 @@ export const addReplyToReview = async (
 // Cập nhật phản hồi của một đánh giá cụ thể
 export const updateReply = async (
   replyId: number,
-  data: { replyText: string }
+  data: { staffId: number; replyText: string }
 ) => {
   const response = await axiosInstance.put(`/review/reply/${replyId}`, data);
   return response.data;

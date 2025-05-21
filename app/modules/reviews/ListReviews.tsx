@@ -1,10 +1,30 @@
 import { useEffect, useState } from "react";
-import { Button, Space, Typography, message, Modal, Form, Input, Rate, Switch } from "antd";
-import { EditOutlined, EyeOutlined, EyeInvisibleOutlined, MessageOutlined } from "@ant-design/icons";
-import { getAllReviews, updateReview, addReplyToReview, updateReply } from "~/api/review";
+import {
+  Button,
+  Space,
+  Typography,
+  message,
+  Modal,
+  Form,
+  Input,
+  Rate,
+  Switch,
+} from "antd";
+import {
+  EditOutlined,
+  EyeOutlined,
+  EyeInvisibleOutlined,
+  MessageOutlined,
+} from "@ant-design/icons";
+import {
+  getAllReviews,
+  updateReview,
+  addReplyToReview,
+  updateReply,
+} from "~/api/review";
 import { Tooltip } from "antd";
-import { Table, type TableColumnsType } from 'antd';
-
+import { Table, type TableColumnsType } from "antd";
+import { useAuth } from "~/hooks/useAuth";
 
 const { Title } = Typography;
 
@@ -17,7 +37,12 @@ interface Review {
   isHidden: boolean;
   createdAt: string;
   images: { id: number; img_url: string }[];
-  replies: { id: number; staffId: number; replyText: string; createdAt: string }[];
+  replies: {
+    id: number;
+    staffId: number;
+    replyText: string;
+    createdAt: string;
+  }[];
 }
 
 export default function ListReviews() {
@@ -29,6 +54,7 @@ export default function ListReviews() {
   const [replyForm] = Form.useForm();
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     fetchReviews();
@@ -51,7 +77,7 @@ export default function ListReviews() {
       const values = await replyForm.validateFields();
       if (currentReviewId) {
         await addReplyToReview(currentReviewId, {
-          staffId: 1,
+          staffId: Number(user?.userId),
           replyText: values.replyText,
         });
         message.success("Phản hồi đã được thêm");
@@ -91,7 +117,10 @@ export default function ListReviews() {
     try {
       const values = await replyForm.validateFields();
       if (currentReplyId) {
-        await updateReply(currentReplyId, values);
+        await updateReply(currentReplyId, {
+          ...values,
+          staffId: Number(user?.userId), 
+        });
         message.success("Cập nhật phản hồi thành công");
         fetchReviews();
       }
@@ -131,9 +160,12 @@ export default function ListReviews() {
       key: "productId",
       width: 150,
       filters: reviews
-        .map((review) => ({ text: review.productId.toString(), value: review.productId }))
+        .map((review) => ({
+          text: review.productId.toString(),
+          value: review.productId,
+        }))
         .filter((v, i, a) => a.findIndex((t) => t.value === v.value) === i), // Loại bỏ trùng lặp
-        onFilter: (value, record) => record.productId === value,
+      onFilter: (value, record) => record.productId === value,
       sorter: (a: Review, b: Review) => a.productId - b.productId, // Sắp xếp tăng dần/giảm dần
     },
     {
@@ -142,9 +174,12 @@ export default function ListReviews() {
       key: "userId",
       width: 150,
       filters: reviews
-        .map((review) => ({ text: review.userId.toString(), value: review.userId }))
+        .map((review) => ({
+          text: review.userId.toString(),
+          value: review.userId,
+        }))
         .filter((v, i, a) => a.findIndex((t) => t.value === v.value) === i), // Loại bỏ trùng lặp
-        onFilter: (value, record) => record.userId === value,
+      onFilter: (value, record) => record.userId === value,
       sorter: (a: Review, b: Review) => a.userId - b.userId, // Sắp xếp tăng dần/giảm dần
     },
     {
@@ -169,12 +204,22 @@ export default function ListReviews() {
       key: "comment",
       ellipsis: true,
       width: 200,
+      sorter: (a, b) =>
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
       render: (_: string, record: { comment: string; createdAt: string }) => (
         <Tooltip title={record.comment} placement="topLeft">
-          <div style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+          <div
+            style={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
             <span>{record.comment}</span>
             <br />
-            <small style={{ color: "gray" }}>{new Date(record.createdAt).toLocaleString()}</small>
+            <small style={{ color: "gray" }}>
+              {new Date(record.createdAt).toLocaleString()}
+            </small>
           </div>
         </Tooltip>
       ),
@@ -203,17 +248,23 @@ export default function ListReviews() {
       dataIndex: "replies",
       key: "replies",
       width: 300,
-      render: (replies: { id: number; replyText: string; createdAt: string }[]) =>
+      render: (
+        replies: { id: number; replyText: string; createdAt: string }[]
+      ) =>
         replies.map((reply) => (
-          <Tooltip
-            key={reply.id}
-            title={reply.replyText}
-            placement="topLeft"
-          >
-            <div style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+          <Tooltip key={reply.id} title={reply.replyText} placement="topLeft">
+            <div
+              style={{
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
               <span>{reply.replyText}</span>
               <br />
-              <small style={{ color: "gray" }}>{new Date(reply.createdAt).toLocaleString()}</small>
+              <small style={{ color: "gray" }}>
+                {new Date(reply.createdAt).toLocaleString()}
+              </small>
             </div>
           </Tooltip>
         )),
@@ -293,7 +344,9 @@ export default function ListReviews() {
           <Form.Item
             name="replyText"
             label="Reply"
-            rules={[{ required: true, message: "Phản hồi không được để trống" }]}
+            rules={[
+              { required: true, message: "Phản hồi không được để trống" },
+            ]}
           >
             <Input.TextArea rows={4} />
           </Form.Item>

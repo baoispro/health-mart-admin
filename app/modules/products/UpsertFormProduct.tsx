@@ -64,7 +64,14 @@ export default function UpsertFormProduct({
           manufacturer: product.manufacturer,
           registration_number: product.registration_number,
           description_html: product.description_html,
-          image_url: product.image_url,
+          image_url: product.image_url
+            ? product.image_url.split(",").map((url: string, idx: number) => ({
+                uid: `${idx}`,
+                name: url.split("/").pop() || `image_${idx}.jpg`,
+                status: "done",
+                url,
+              }))
+            : [],
           name_ingradient:
             product.ingredients.length > 0 ? product.ingredients[0].name : "",
           concentration:
@@ -248,8 +255,22 @@ export default function UpsertFormProduct({
       formData.append("registration_number", values.registration_number);
       formData.append("description_html", values.description_html);
       formData.append("slug", values.slug);
-      if (values.image_url instanceof File) {
-        formData.append("image_url", values.image_url.originFileObj);
+      formData.append("discount_percentage", values.discount_percentage ?? 0);
+      const imageLinks: string[] = [];
+      if (Array.isArray(values.image_url)) {
+        values.image_url.forEach((fileObj: any) => {
+          if (fileObj.originFileObj) {
+            // Ảnh mới: gửi file
+            formData.append("image_url", fileObj.originFileObj);
+          } else if (fileObj.url) {
+            // Ảnh cũ: lưu lại link
+            imageLinks.push(fileObj.url);
+          }
+        });
+      }
+      // Chỉ append 1 lần cho link ảnh cũ (nếu có)
+      if (imageLinks.length > 0) {
+        formData.append("image_url", imageLinks.join(","));
       }
 
       let res;
