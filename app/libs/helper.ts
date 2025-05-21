@@ -9,3 +9,8 @@ export const generateSlug = (str: string) =>
     .replace(/[^\w\-]+/g, "") // bỏ ký tự đặc biệt
     .replace(/\-\-+/g, "-") // gộp nhiều dấu -
     .replace(/^-+|-+$/g, ""); // bỏ - đầu/cuối
+
+export function formatCurrency(value: number | string): string {
+  const num = typeof value === "string" ? parseInt(value, 10) : value;
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "₫";
+}

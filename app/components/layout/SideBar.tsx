@@ -56,13 +56,21 @@ const Sidebar = () => {
           />
           <SidebarIcon
             icon={
+              <TagIcon className="w-6 h-6 hover:text-[#000]" color="#64748b" />
+            }
+            tooltip="Categories"
+            to="/categories"
+            active={location.pathname === "/categories"}
+          />
+          <SidebarIcon
+            icon={
               <ShoppingCartIcon
                 className="w-6 h-6 hover:text-[#000]"
                 color="#64748b"
               />
             }
             tooltip="Orders"
-            to="/"
+            to="/orders"
             active={location.pathname === "/orders"}
           />
           <SidebarIcon

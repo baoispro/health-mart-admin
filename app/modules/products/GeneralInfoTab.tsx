@@ -8,13 +8,20 @@ import {
   message,
   type FormInstance,
   Upload,
+  Button,
 } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { getAllCategories } from "~/api/product";
 import { generateSlug } from "~/libs/helper";
 
-export default function GeneralInfoTab({ form }: { form: FormInstance }) {
+export default function GeneralInfoTab({
+  form,
+  setImage,
+}: {
+  form: FormInstance;
+  setImage: (file: any) => void;
+}) {
   const [categories, setCategories] = useState([]);
   const [loadingCategory, setLoadingCategory] = useState(false);
 
@@ -40,7 +47,7 @@ export default function GeneralInfoTab({ form }: { form: FormInstance }) {
     const walk = (nodes: any[], prefix = "") => {
       for (const node of nodes) {
         result.push({
-          label: prefix + node.name,
+          label: node.name,
           value: node.category_id,
         });
 
@@ -132,22 +139,32 @@ export default function GeneralInfoTab({ form }: { form: FormInstance }) {
 
           {/* image_url */}
           <Form.Item
-            name="image_url"
+            name="avatarFile"
             label="Ảnh sản phẩm"
             valuePropName="fileList"
             getValueFromEvent={(e) => Array.isArray(e) ? e : e?.fileList}
             rules={[{ required: true, message: "Vui lòng chọn ảnh sản phẩm" }]}
           >
-            <Upload
+            {/* <Upload
               listType="picture-card"
               multiple
               beforeUpload={() => false} // không upload tự động
               accept="image/*"
+              onChange={({ fileList }) => setImage(fileList)}
             >
               <div>
                 <PlusOutlined />
                 <div style={{ marginTop: 8 }}>Upload</div>
               </div>
+            </Upload> */}
+
+            <Upload
+              listType="picture"
+              // fileList={fileList}
+              beforeUpload={() => false} // Ngăn không cho upload tự động
+              onChange={({ fileList }) => setImage(fileList)}
+            >
+              <Button icon={<UploadOutlined />}>Chọn ảnh</Button>
             </Upload>
           </Form.Item>
         </Col>
@@ -212,13 +229,7 @@ export default function GeneralInfoTab({ form }: { form: FormInstance }) {
           </Form.Item>
 
           {/* description_html */}
-          <Form.Item
-            name="description_html"
-            label="Mô tả HTML"
-            rules={[
-              { required: true, message: "Mô tả chi tiết không được để trống" },
-            ]}
-          >
+          <Form.Item name="description_html" label="Mô tả HTML">
             <Input.TextArea
               rows={5}
               placeholder="Nhập đoạn html của mô tả sản phẩm"
