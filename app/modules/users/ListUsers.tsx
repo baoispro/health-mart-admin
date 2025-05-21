@@ -1,8 +1,25 @@
 import { useEffect, useState } from "react";
-import { Table, Button, Space, Typography, message, Modal, Form, Input, Select, Upload } from "antd";
-import { EditOutlined, DeleteOutlined, PlusCircleFilled, UploadOutlined } from "@ant-design/icons";
+import {
+  Table,
+  Button,
+  Space,
+  Typography,
+  message,
+  Modal,
+  Form,
+  Input,
+  Select,
+  Upload,
+} from "antd";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  PlusCircleFilled,
+  UploadOutlined,
+} from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import { getAllUsers, createUser, updateUser, deleteUser } from "~/api/user";
+import { toast } from "react-toastify";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -34,8 +51,9 @@ export default function ListUsers() {
       setLoading(true);
       const data = await getAllUsers();
       setUsers(data);
+      toast.success("Lấy danh sách người dùng thành công");
     } catch (error) {
-      message.error("Lỗi khi tải danh sách người dùng");
+      toast.error("Lỗi khi tải danh sách người dùng");
     } finally {
       setLoading(false);
     }
@@ -54,13 +72,13 @@ export default function ListUsers() {
     setFileList(
       user.avatar
         ? [
-          {
-            uid: "-1",
-            name: "avatar.png",
-            status: "done",
-            url: user.avatar,
-          },
-        ]
+            {
+              uid: "-1",
+              name: "avatar.png",
+              status: "done",
+              url: user.avatar,
+            },
+          ]
         : []
     );
     setIsModalOpen(true);
@@ -69,10 +87,10 @@ export default function ListUsers() {
   const handleDeleteUser = async (id: number) => {
     try {
       await deleteUser(id);
-      message.success("Xóa người dùng thành công");
+      toast.success("Xóa người dùng thành công");
       fetchUsers();
     } catch (error) {
-      message.error("Lỗi khi xóa người dùng");
+      toast.error("Lỗi khi xóa người dùng");
     }
   };
 
@@ -98,10 +116,10 @@ export default function ListUsers() {
       if (!editingUser) {
         formData.append("password", values.password);
         await createUser(formData);
-        message.success("Tạo người dùng thành công");
+        toast.success("Tạo người dùng thành công");
       } else {
-        await updateUser(editingUser.id, formData);
-        message.success("Cập nhật người dùng thành công");
+        await updateUser(editingUser.id.toString(), formData);
+        toast.success("Cập nhật người dùng thành công");
       }
 
       setIsModalOpen(false);
@@ -110,7 +128,10 @@ export default function ListUsers() {
       if (error.response?.status === 409) {
         const errorMessage = error.response.data.message;
 
-        if (errorMessage.includes("Email") || errorMessage.includes("số điện thoại")) {
+        if (
+          errorMessage.includes("Email") ||
+          errorMessage.includes("số điện thoại")
+        ) {
           form.setFields([
             {
               name: "phone",
@@ -119,7 +140,7 @@ export default function ListUsers() {
           ]);
         }
       } else {
-        message.error("Đã xảy ra lỗi, vui lòng thử lại");
+        toast.error("Đã xảy ra lỗi, vui lòng thử lại");
       }
     }
   };
@@ -210,7 +231,7 @@ export default function ListUsers() {
         loading={loading}
         columns={columns}
         dataSource={users}
-        pagination={{ pageSize: 5 }}
+        pagination={{ pageSize: 10 }}
         bordered
       />
 
@@ -282,7 +303,9 @@ export default function ListUsers() {
             <Form.Item
               name="password"
               label="Password"
-              rules={[{ required: true, message: "Mật khẩu không được để trống" }]}
+              rules={[
+                { required: true, message: "Mật khẩu không được để trống" },
+              ]}
             >
               <Input.Password />
             </Form.Item>

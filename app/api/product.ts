@@ -35,7 +35,7 @@ export const updateCategory = async (id: number, payload: any) => {
 };
 
 export const createIngredients = async (sideEffects: any) => {
-  const res = await axiosInstance.post(`/product/side-effects`, sideEffects);
+  const res = await axiosInstance.post(`/product/ingredients`, sideEffects);
   return res.data;
 };
 

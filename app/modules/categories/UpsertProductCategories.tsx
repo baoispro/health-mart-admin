@@ -1,5 +1,6 @@
 import { Form, Input, Modal, Select, message, Spin } from "antd";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import {
   createCategory,
   updateCategory,
@@ -32,7 +33,7 @@ export default function UpsertProductCategories({
       const res = await getAllCategories();
       setCategories(res);
     } catch (error) {
-      message.error("Không thể tải danh sách danh mục cha");
+      toast.error("Không thể tải danh sách danh mục cha");
     }
   };
 
@@ -47,7 +48,7 @@ export default function UpsertProductCategories({
         parent_id: data.parent?.category_id || undefined,
       });
     } catch (error) {
-      message.error("Không thể tải chi tiết danh mục!");
+      toast.error("Không thể tải chi tiết danh mục!");
     } finally {
       setLoadingDetail(false);
     }
@@ -68,17 +69,17 @@ export default function UpsertProductCategories({
 
       if (mode === "create") {
         await createCategory(values);
-        message.success("Tạo danh mục thành công!");
+        toast.success("Tạo danh mục thành công!");
       } else if (categoryId) {
         await updateCategory(categoryId, values);
-        message.success("Cập nhật danh mục thành công!");
+        toast.success("Cập nhật danh mục thành công!");
       }
 
       form.resetFields();
       onClose();
       onSuccess?.();
     } catch (error) {
-      message.error("Xử lý danh mục thất bại!");
+      toast.error("Xử lý danh mục thất bại!");
     }
   };
 

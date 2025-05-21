@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { ToastContainer } from "react-toastify";
 import { logoutAPI } from "~/api/auth";
 
 interface AuthUser {
@@ -6,6 +7,7 @@ interface AuthUser {
   accessToken: string;
   refreshToken: string;
   userId: string;
+  user: any;
 }
 
 interface AuthContextType {
@@ -14,21 +16,21 @@ interface AuthContextType {
   logout: () => void;
   isAuthenticated: boolean;
   setAccessToken: (token: string) => void;
-  loading: boolean; // 👈 thêm trạng thái loading
+  loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<AuthUser | null>(null);
-  const [loading, setLoading] = useState(true); // 👈 ban đầu loading = true
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const stored = localStorage.getItem("auth_user");
     if (stored) {
       setUser(JSON.parse(stored));
     }
-    setLoading(false); // 👈 đọc xong thì mới tắt loading
+    setLoading(false);
   }, []);
 
   const login = (user: AuthUser) => {

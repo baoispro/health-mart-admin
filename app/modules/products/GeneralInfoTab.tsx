@@ -14,14 +14,9 @@ import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { getAllCategories } from "~/api/product";
 import { generateSlug } from "~/libs/helper";
+import { toast } from "react-toastify";
 
-export default function GeneralInfoTab({
-  form,
-  setImage,
-}: {
-  form: FormInstance;
-  setImage: (file: any) => void;
-}) {
+export default function GeneralInfoTab({ form }: { form: FormInstance }) {
   const [categories, setCategories] = useState([]);
   const [loadingCategory, setLoadingCategory] = useState(false);
 
@@ -31,7 +26,7 @@ export default function GeneralInfoTab({
       const data = await getAllCategories();
       setCategories(data);
     } catch (e) {
-      message.error("Không thể tải danh mục");
+      toast.error("Không thể tải danh mục");
     } finally {
       setLoadingCategory(false);
     }
@@ -142,29 +137,19 @@ export default function GeneralInfoTab({
             name="avatarFile"
             label="Ảnh sản phẩm"
             valuePropName="fileList"
-            getValueFromEvent={(e) => Array.isArray(e) ? e : e?.fileList}
+            getValueFromEvent={(e) => (Array.isArray(e) ? e : e?.fileList)}
             rules={[{ required: true, message: "Vui lòng chọn ảnh sản phẩm" }]}
           >
-            {/* <Upload
+            <Upload
               listType="picture-card"
               multiple
               beforeUpload={() => false} // không upload tự động
               accept="image/*"
-              onChange={({ fileList }) => setImage(fileList)}
             >
               <div>
                 <PlusOutlined />
                 <div style={{ marginTop: 8 }}>Upload</div>
               </div>
-            </Upload> */}
-
-            <Upload
-              listType="picture"
-              // fileList={fileList}
-              beforeUpload={() => false} // Ngăn không cho upload tự động
-              onChange={({ fileList }) => setImage(fileList)}
-            >
-              <Button icon={<UploadOutlined />}>Chọn ảnh</Button>
             </Upload>
           </Form.Item>
         </Col>
@@ -241,7 +226,12 @@ export default function GeneralInfoTab({
             label="Khuyến mãi (%)"
             rules={[
               { required: false },
-              { type: "number", min: 0, max: 100, message: "Nhập giá trị từ 0 đến 100" },
+              {
+                type: "number",
+                min: 0,
+                max: 100,
+                message: "Nhập giá trị từ 0 đến 100",
+              },
             ]}
           >
             <InputNumber

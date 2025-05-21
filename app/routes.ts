@@ -18,6 +18,5 @@ export default [
     route("reviews", "routes/reviews.tsx"),
     // thêm route khác muốn dùng layout chung ở đây
   ]),
-  route("sign-in", "routes/login.tsx"),
-  route("sign-up", "routes/sign-up.tsx"),
+  route("login", "routes/login.tsx"),
 ];

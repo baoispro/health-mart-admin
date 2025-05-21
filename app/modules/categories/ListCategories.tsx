@@ -8,6 +8,7 @@ import {
   PlusCircleFilled,
 } from "@ant-design/icons";
 import UpsertProductCategories from "./UpsertProductCategories";
+import { toast } from "react-toastify";
 
 const { Title, Text } = Typography;
 
@@ -26,9 +27,9 @@ export default function ProductCategories() {
       const data = await getAllCategories();
       const formatted = flattenCategories(data);
       setCategories(formatted);
-      message.success("Lấy danh sách danh mục thành công!");
+      toast.success("Lấy danh sách danh mục thành công!");
     } catch (err) {
-      message.error("Lỗi khi lấy danh sách danh mục!");
+      toast.error("Lỗi khi lấy danh sách danh mục!");
     } finally {
       setLoading(false);
     }

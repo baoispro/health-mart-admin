@@ -5,6 +5,7 @@ import type { ColumnsType } from "antd/es/table";
 
 import { getAllOrders } from "~/api/orders";
 import { formatCurrency } from "~/libs/helper";
+import { toast } from "react-toastify";
 
 const { Title, Text } = Typography;
 
@@ -24,7 +25,7 @@ export default function ListOrders() {
       const data = await getAllOrders();
       setOrders(data);
     } catch (error) {
-      message.error("Lỗi khi tải danh sách chính sách");
+      toast.error("Lỗi khi tải danh sách chính sách");
     } finally {
       setLoading(false);
     }
@@ -120,7 +121,7 @@ export default function ListOrders() {
         loading={loading}
         columns={columns}
         dataSource={orders}
-        pagination={{ pageSize: 5 }}
+        pagination={{ pageSize: 10 }}
         bordered
       />
     </div>
