@@ -141,12 +141,13 @@ export default function GeneralInfoTab({
           <Form.Item
             name="avatarFile"
             label="Ảnh sản phẩm"
-            valuePropName="file"
+            valuePropName="fileList"
+            getValueFromEvent={(e) => Array.isArray(e) ? e : e?.fileList}
             rules={[{ required: true, message: "Vui lòng chọn ảnh sản phẩm" }]}
           >
             {/* <Upload
               listType="picture-card"
-              maxCount={1}
+              multiple
               beforeUpload={() => false} // không upload tự động
               accept="image/*"
               onChange={({ fileList }) => setImage(fileList)}
@@ -232,6 +233,23 @@ export default function GeneralInfoTab({
             <Input.TextArea
               rows={5}
               placeholder="Nhập đoạn html của mô tả sản phẩm"
+            />
+          </Form.Item>
+          {/* discount_percentage */}
+          <Form.Item
+            name="discount_percentage"
+            label="Khuyến mãi (%)"
+            rules={[
+              { required: false },
+              { type: "number", min: 0, max: 100, message: "Nhập giá trị từ 0 đến 100" },
+            ]}
+          >
+            <InputNumber
+              min={0}
+              max={100}
+              style={{ width: "100%" }}
+              placeholder="Nhập phần trăm khuyến mãi"
+              addonAfter="%"
             />
           </Form.Item>
         </Col>

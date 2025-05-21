@@ -32,37 +32,37 @@ export default function ProductList() {
 
   const columns: ColumnsType<any> = [
     {
-      title: "ID",
-      dataIndex: "product_id",
-      key: "product_id",
-    },
-    {
       title: "Hình ảnh",
       dataIndex: "image_url",
       key: "image_url",
       width: 120,
-      render: (url: string) => (
-        <Image
-          src={url || "https://via.placeholder.com/60"}
-          alt="Ảnh"
-          width={120}
-          height={120}
-          style={{ objectFit: "cover" }}
-          preview={false}
-        />
-      ),
+      render: (url: string) => {
+        // Lấy link đầu tiên, loại bỏ khoảng trắng thừa
+        const firstImg = url ? url.split(",")[0].trim() : "";
+        return (
+          <Image
+            src={firstImg || "https://via.placeholder.com/60"}
+            alt="Ảnh"
+            width={120}
+            height={120}
+            style={{ objectFit: "cover" }}
+            preview={false}
+            fallback="https://via.placeholder.com/60"
+          />
+        );
+      },
     },
     {
       title: "Tên sản phẩm",
       dataIndex: "name",
       key: "name",
     },
-    {
-      title: "Giá",
-      dataIndex: "price",
-      key: "price",
-      render: (text: number) => `${text.toLocaleString()}₫`,
-    },
+    // {
+    //   title: "Giá",
+    //   dataIndex: "price",
+    //   key: "price",
+    //   render: (text: number) => `${text.toLocaleString()}₫`,
+    // },
     {
       title: "Hãng",
       dataIndex: "brand",
