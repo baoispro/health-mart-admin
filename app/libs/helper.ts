@@ -14,3 +14,16 @@ export function formatCurrency(value: number | string): string {
   const num = typeof value === "string" ? parseInt(value, 10) : value;
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "₫";
 }
+
+export const formatNumber = (value: number, prefix?: React.ReactNode) => {
+  if (value >= 1000000) {
+    return `${(value / 1000000).toFixed(0)}m`;
+  } else if (value >= 1000) {
+    const thousands = Math.floor(value / 1000);
+    const remainder = value % 1000;
+    return ` ${prefix ?? ""}  ${thousands},${
+      remainder > 0 ? Math.floor(remainder / 100) + `K` : ""
+    }`;
+  }
+  return `${prefix ?? ""}${value.toString()}`;
+};
