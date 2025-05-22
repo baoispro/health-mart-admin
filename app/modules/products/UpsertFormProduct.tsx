@@ -13,6 +13,7 @@ import {
   createSideEffects,
   createStorages,
   createUsages,
+  createPrecautions,
   getAllProducts,
   getProductById,
   getProductDosagesById,
@@ -22,6 +23,7 @@ import {
   updateProductSideEffectsById,
   updateProductStoragesById,
   updateProductUsagesById,
+  updateProductPrecautionsById,
   // getProductDetail,
   // updateProduct,
 } from "~/api/product";
@@ -65,6 +67,7 @@ export default function UpsertFormProduct({
           manufacturer: product.manufacturer,
           registration_number: product.registration_number,
           description_html: product.description_html,
+          discount_percentage: product.discount_percentage,
           image_url: product.image_url
             ? product.image_url.split(",").map((url: string, idx: number) => ({
                 uid: `${idx}`,
@@ -73,8 +76,10 @@ export default function UpsertFormProduct({
                 url,
               }))
             : [],
-          name_ingradient:
-            product.ingredients.length > 0 ? product.ingredients[0].name : "",
+          ingredients: product.ingredients.map((item: any) => ({
+            name_ingradient: item.name,
+            concentration: item.concentration,
+          })),
           concentration:
             product.ingredients.length > 0
               ? product.ingredients[0].concentration
@@ -149,8 +154,10 @@ export default function UpsertFormProduct({
 
         const payloadIngredients = {
           ...(mode === "edit" ? {} : { product_id: id }),
-          name: values.name_ingradient,
-          concentration: values.concentration,
+          ingredients: (values.ingredients || []).map((item: any) => ({
+            name: item.name_ingradient,
+            concentration: item.concentration,
+          })),
         };
         const payloadStorages = {
           ...(mode === "edit" ? {} : { product_id: id }),
@@ -167,6 +174,10 @@ export default function UpsertFormProduct({
         const payloadSideEffects = {
           ...(mode === "edit" ? {} : { product_id: id }),
           description: values.description_side_effects,
+        };
+        const payloadPrecautions = {
+          ...(mode === "edit" ? {} : { product_id: id }),
+          description: values.description_precautions,
         };
 
         await Promise.all([
@@ -185,6 +196,9 @@ export default function UpsertFormProduct({
           mode === "edit"
             ? updateProductStoragesById(id, payloadStorages)
             : createStorages(payloadStorages),
+          mode === "edit"
+            ? updateProductPrecautionsById(id, payloadPrecautions)
+            : createPrecautions(payloadPrecautions),
         ]);
 
         toast.success(

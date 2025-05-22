@@ -83,18 +83,24 @@ export const updateProductIngredientsById = async (
   id: number,
   payload: any
 ) => {
-  const res = await axiosInstance.post(`/product/${id}/ingredients`, payload);
+  const res = await axiosInstance.put(`/product/ingredients/${id}`, payload);
   return res.data;
 };
 
 export const getProductUsagesById = async (id: number) => {
-  const res = await axiosInstance.get(`/product/${id}/usages`);
+  const res = await axiosInstance.get(`/product/${id}/usage`);
   return res.data;
 };
 
-export const updateProductUsagesById = async (id: number, payload: any) => {
-  const res = await axiosInstance.post(`/product/${id}/usages`, payload);
-  return res.data;
+export const updateProductUsagesById = async (
+  productId: number,
+  payload: any
+) => {
+  const usages = (await getProductUsagesById(productId))?.data;
+  if (!usages || usages.length === 0) return null;
+  const usageId = usages[0].usage_id;
+  const putRes = await axiosInstance.put(`/product/usages/${usageId}`, payload);
+  return putRes.data;
 };
 
 export const getProductDosagesById = async (id: number) => {
@@ -102,9 +108,18 @@ export const getProductDosagesById = async (id: number) => {
   return res.data;
 };
 
-export const updateProductDosagesById = async (id: number, payload: any) => {
-  const res = await axiosInstance.post(`/product/${id}/dosages`, payload);
-  return res.data;
+export const updateProductDosagesById = async (
+  productId: number,
+  payload: any
+) => {
+  const dosages = (await getProductDosagesById(productId))?.data;
+  if (!dosages || dosages.length === 0) return null;
+  const dosageId = dosages[0].dosage_id;
+  const putRes = await axiosInstance.put(
+    `/product/dosages/${dosageId}`,
+    payload
+  );
+  return putRes.data;
 };
 
 export const getProductPrecautionsById = async (id: number) => {
@@ -113,11 +128,17 @@ export const getProductPrecautionsById = async (id: number) => {
 };
 
 export const updateProductPrecautionsById = async (
-  id: number,
+  productId: number,
   payload: any
 ) => {
-  const res = await axiosInstance.post(`/product/${id}/precautions`, payload);
-  return res.data;
+  const precautions = (await getProductPrecautionsById(productId))?.data;
+  if (!precautions || precautions.length === 0) return null;
+  const precautionId = precautions[0].precaution_id;
+  const putRes = await axiosInstance.put(
+    `/product/precautions/${precautionId}`,
+    payload
+  );
+  return putRes.data;
 };
 
 export const getProductSideEffectsById = async (id: number) => {
@@ -126,21 +147,42 @@ export const getProductSideEffectsById = async (id: number) => {
 };
 
 export const updateProductSideEffectsById = async (
-  id: number,
-  payload: any
+  productId: number,
+  payload: { description: string }
 ) => {
-  const res = await axiosInstance.post(`/product/${id}/side-effects`, payload);
-  return res.data;
+  const sideEffects = (await getProductSideEffectsById(productId))?.data;
+
+  if (!sideEffects || sideEffects.length === 0) {
+    return null;
+  }
+
+  const sideEffectId = sideEffects[0].side_effect_id;
+
+  const putRes = await axiosInstance.put(
+    `/product/side-effects/${sideEffectId}`,
+    payload
+  );
+
+  return putRes.data;
 };
 
 export const getProductStoragesById = async (id: number) => {
-  const res = await axiosInstance.get(`/product/${id}/storages`);
+  const res = await axiosInstance.get(`/product/${id}/storage`);
   return res.data;
 };
 
-export const updateProductStoragesById = async (id: number, payload: any) => {
-  const res = await axiosInstance.post(`/product/${id}/storages`, payload);
-  return res.data;
+export const updateProductStoragesById = async (
+  productId: number,
+  payload: any
+) => {
+  const storages = (await getProductStoragesById(productId))?.data;
+  if (!storages || storages.length === 0) return null;
+  const storageId = storages[0].storage_id;
+  const putRes = await axiosInstance.put(
+    `/product/storages/${storageId}`,
+    payload
+  );
+  return putRes.data;
 };
 
 export const deleteProductById = async (id: number) => {

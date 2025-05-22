@@ -9,6 +9,7 @@ import {
   type FormInstance,
   Upload,
   Button,
+  Cascader,
 } from "antd";
 import { PlusOutlined, UploadOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
@@ -17,14 +18,28 @@ import { generateSlug } from "~/libs/helper";
 import { toast } from "react-toastify";
 
 export default function GeneralInfoTab({ form }: { form: FormInstance }) {
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState<any[]>([]);
   const [loadingCategory, setLoadingCategory] = useState(false);
+
+  const markOnlyLevel3Selectable = (nodes: any[]): any[] => {
+    return nodes.map((node) => {
+      if (node.children && node.children.length > 0) {
+        return {
+          ...node, 
+          disabled: true, // không cho chọn cấp 1 và 2
+          children: markOnlyLevel3Selectable(node.children),
+        };
+      }
+      return node; // cấp 3 (không có children) được chọn
+    });
+  };
 
   const fetchCategories = async () => {
     setLoadingCategory(true);
     try {
       const data = await getAllCategories();
-      setCategories(data);
+      const formatted = markOnlyLevel3Selectable(data);
+      setCategories(formatted);
     } catch (e) {
       toast.error("Không thể tải danh mục");
     } finally {
@@ -123,13 +138,18 @@ export default function GeneralInfoTab({ form }: { form: FormInstance }) {
             label="Danh mục"
             rules={[{ required: true, message: "Vui lòng chọn danh mục" }]}
           >
-            <Select placeholder="Chọn danh mục" loading={loadingCategory}>
-              {formatCategoriesFlat(categories).map((cat) => (
-                <Select.Option key={cat.value} value={cat.value}>
-                  {cat.label}
-                </Select.Option>
-              ))}
-            </Select>
+            <Cascader
+              options={categories}
+              placeholder="Chọn danh mục"
+              changeOnSelect={false}
+              displayRender={(labels) => labels.join(" / ")}
+              fieldNames={{
+                label: "name",
+                value: "category_id",
+                children: "children",
+              }}
+              showSearch
+            />
           </Form.Item>
 
           {/* image_url */}
@@ -137,7 +157,7 @@ export default function GeneralInfoTab({ form }: { form: FormInstance }) {
             name="image_url"
             label="Ảnh sản phẩm"
             valuePropName="fileList"
-            getValueFromEvent={(e) => Array.isArray(e) ? e : e?.fileList}
+            getValueFromEvent={(e) => (Array.isArray(e) ? e : e?.fileList)}
             rules={[{ required: true, message: "Vui lòng chọn ảnh sản phẩm" }]}
           >
             <Upload
